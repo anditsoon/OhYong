@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 269528561}
   - component: {fileID: 269528563}
   - component: {fileID: 269528562}
+  - component: {fileID: 269528564}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -195,6 +196,21 @@ MonoBehaviour:
   moveSpeed: 7
   jumpPower: 10
   model: {fileID: 1666401443}
+--- !u!114 &269528564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 269528560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9810fe96e4a71646bfacb3db64c08e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 7
+  jumpPower: 10
+  model: {fileID: 0}
 --- !u!1 &332547098
 GameObject:
   m_ObjectHideFlags: 0
@@ -297,6 +313,7 @@ GameObject:
   m_Component:
   - component: {fileID: 736852923}
   - component: {fileID: 736852924}
+  - component: {fileID: 736852925}
   m_Layer: 0
   m_Name: Campos
   m_TagString: Untagged
@@ -330,6 +347,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a5fc18915208ff4e8daedf235fecbcf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotSpeed: 200
+--- !u!114 &736852925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 736852922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b328d509ba013e4198dbad600aadf34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rotSpeed: 200
