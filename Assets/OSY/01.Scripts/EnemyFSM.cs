@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class EnemyFSM : MonoBehaviour
 {
+    //애니메이터 변수
+    Animator anim;
+
 
     // FSM State
     enum EnemyState
@@ -16,11 +19,14 @@ public class EnemyFSM : MonoBehaviour
     EnemyState m_State;
 
     // 플레이어 발견 범위
-    public float findDistance = 15f;
+    public float findDistance = 30f;
     // 이동 가능 범위
-    public float moveDistance = 10f;
+    public float moveDistance = 20f;
     // 공격 가능 범위
-    public float attackDistance = 5f;
+    public float attackDistance = 10f;
+    // BackJump 거리
+    public float backJumpDistance = 5f;
+   
 
     // 플레이어 트랜스폼
     public Transform playerTransform;
@@ -35,14 +41,13 @@ public class EnemyFSM : MonoBehaviour
     // Attack1로 갈지 Attack2로 갈지 랜덤함수
     int attackRandom = Random.Range(0, 2);
 
-    // BackJump 거리
-    public float backJumpDistance = 2f;
 
     // 누적시간
     float currentTime = 0;
 
     // 초기 위치 저장용 변수
     Vector3 originPos;
+    Quaternion originRot;
 
 
     // 공격딜레이 시간
@@ -62,10 +67,15 @@ public class EnemyFSM : MonoBehaviour
         // 플레이어의 트랜스폼 컴포넌트 가져오기
         playerTransform = GameObject.Find("Player").transform;
 
+        // 자신의 초기 위치와 외전값
         originPos = transform.position;
+        originRot = transform.rotation;
 
         //캐릭터 컴포넌트 받아오기
         cc = GetComponent<CharacterController>();
+
+        // 자식 오브젝트로부터 애니메이터 변수 받아오기
+        anim = transform.GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -102,14 +112,6 @@ public class EnemyFSM : MonoBehaviour
 
         print(m_State);
 
-        if(nowreturn == false)
-        {
-            transform.forward = playerTransform.position - transform.position;
-        }
-        else if(nowreturn == true)
-        {
-            transform.forward = originPos-transform.position;
-        }
     }
 
     void Idle()
@@ -117,12 +119,18 @@ public class EnemyFSM : MonoBehaviour
         // 만약 플레이어와의 거리가 액션 시작 범위 이내라면 
         if (Vector3.Distance(transform.position, playerTransform.position) > findDistance)
         {
-            //Move로 바꾼다
             m_State = EnemyState.Return;
+        }
+        else if(Vector3.Distance(transform.position,playerTransform.position)> attackDistance)
+        {
+            //Move로 바꾼다
+            m_State = EnemyState.Move;
+            anim.SetTrigger("IdleToMove");
         }
         else
         {
-            m_State = EnemyState.Move;
+            //BackJump로 바꾼다.
+            m_State = EnemyState.BackJump;
         }
     }
     void Move()
@@ -137,9 +145,11 @@ public class EnemyFSM : MonoBehaviour
         {
             Vector3 dir = (playerTransform.position - transform.position).normalized;
             // 캐릭터 컨트롤러 이용해서 이동하기
-           cc.Move(dir * moveSpeed * Time.deltaTime);
+             cc.Move(dir * moveSpeed * Time.deltaTime);
+
+            transform.forward = dir;
         }
-        else
+        else if(Vector3.Distance(transform.position,playerTransform.position)>backJumpDistance)
         {
             // 다음 공격을 위해 랜덤 설정을 다시 초기화
             attackRandom = Random.Range(0, 2);
@@ -151,13 +161,20 @@ public class EnemyFSM : MonoBehaviour
 
                 // 바로 공격할 수 있게 미리 시간을 돌려놓는다
                 currentTime = attackDelay;
+                anim.SetTrigger("MoveToAttack1Delay");
             }
             else
             {
                 m_State = EnemyState.Attack2;
                 // 바로 공격할 수 있게 미리 시간을 돌려놓는다
                 currentTime = attackDelay;
+                anim.SetTrigger("MoveToAttack2Delay");
             }
+        }
+        else
+        {
+            m_State = EnemyState.BackJump;
+            anim.SetTrigger("MoveToBackJump");
         }
 
 
@@ -168,6 +185,8 @@ public class EnemyFSM : MonoBehaviour
         if (Vector3.Distance(transform.position, playerTransform.position) > attackDistance)
         {
             m_State = EnemyState.Move;
+            // 이동 애니메이션 플레이
+            anim.SetTrigger("AttackToMove");
             currentTime = 0;
         }
         // 그렇지 않고 백점프 거리보다 크면 공격해
@@ -178,6 +197,7 @@ public class EnemyFSM : MonoBehaviour
             if (currentTime > attackDelay)
             {
                 // 공격을 한다
+                anim.SetTrigger("StartAttack1");
                 // 시간 초기화
                 currentTime = 0;
             }
@@ -187,6 +207,7 @@ public class EnemyFSM : MonoBehaviour
         {
             m_State = EnemyState.BackJump;
             currentTime = 0;
+            anim.SetTrigger("Attack1ToBackJump");
         }
 
     }
@@ -197,6 +218,7 @@ public class EnemyFSM : MonoBehaviour
         {
             m_State = EnemyState.Move;
             currentTime = 0;
+            anim.SetTrigger("Attack2ToMove");
         }
         // 그렇지 않고 백점프 거리보다 크면 공격해
         else if (Vector3.Distance(transform.position, playerTransform.position) > backJumpDistance)
@@ -206,6 +228,8 @@ public class EnemyFSM : MonoBehaviour
             if (currentTime > attackDelay)
             {
                 // 공격을 한다
+                // 공격을 한다
+                anim.SetTrigger("StartAttack2");
                 // 시간 초기화
                 currentTime = 0;
             }
@@ -215,27 +239,27 @@ public class EnemyFSM : MonoBehaviour
         {
             m_State = EnemyState.BackJump;
             currentTime = 0;
+            anim.SetTrigger("Attack2ToBackJump");
         }
     }
     void BackJump()
     {
         StartCoroutine(BackJumpProcess());
-        Vector3 dir = (transform.position - playerTransform.position).normalized;
-        // 백점프를 코루틴을 실행한다.
-        cc.Move(dir * moveSpeed * 1.9f);
-        // 실행된 후 Move로 상태 전환
+        
 
     }
     void Return()
     {
-       
-
         // 만약 초기 위치에서의 거리가 0.1f 이사이면 초기 위치쪽으로 이동한다.
         // 그렇지 않다면 자신의 위치를 초기 위치로 조정하고 현재 상태를 대기로 전환한다.
         if (Vector3.Distance(transform.position, originPos) > 0.1f)
         {
             Vector3 dir = (originPos - transform.position).normalized;
             cc.Move(dir * moveSpeed * Time.deltaTime);
+
+            //방향을 복귀 지점으로 전환한다.
+            transform.forward = dir;
+            
             nowreturn = true;
             
         }
@@ -247,6 +271,9 @@ public class EnemyFSM : MonoBehaviour
             // 상태를 전환한다.
             m_State = EnemyState.Idle;
             nowreturn = false;
+
+            // 대기 애니메이션으로 전환하는 트랜지션을 호출한다.
+            anim.SetTrigger("MoveToIdle");
         }
     }
     void Damaged()
@@ -265,10 +292,31 @@ public class EnemyFSM : MonoBehaviour
     // 백점프 처리용 코루틴 함수
     IEnumerator BackJumpProcess()
     {
-        yield return new WaitForSeconds(2f);
+        Vector3 startPosition = transform.position;
+        Vector3 dir = (transform.position - playerTransform.position).normalized;
+        Vector3 targetPosition = startPosition + dir * backJumpDistance;
 
-        // 현재 상태를 이동상태로 전환한다.
+        while (Vector3.Distance(transform.position, targetPosition) > 0.1f)
+        {
+            Vector3 move = dir * moveSpeed * Time.deltaTime;
+            cc.Move(move);
+
+            // 목표 위치를 초과하지 않도록 현재 위치를 업데이트
+            if (Vector3.Distance(transform.position, targetPosition) <= 0.1f ||
+                Vector3.Dot(dir, (targetPosition - transform.position)) < 0)
+            {
+                break;
+            }
+
+            yield return null; // 한 프레임 대기
+        }
+
+        // 정확한 목표 위치로 설정
+        transform.position = targetPosition;
+
+        // 현재 상태를 백점프로 전환한다.
         m_State = EnemyState.Move;
+        anim.SetTrigger("BackJumpToMove");
     }
     // 데미지 처리용 코루틴 함수
     IEnumerator DamageProcess()
