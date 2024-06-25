@@ -4,26 +4,25 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
+    // 걷기 변수
+    public float walkSpeed = 5f;
+    // 달리기 변수
+    public float runSpeed = 10f;
+    public bool isRunning = false;
     // 이동 속도 변수
-    public float moveSpeed = 7f;
+    public float moveSpeed;
 
     // 캐릭터 콘트롤러 변수
     CharacterController cc;
 
     // 중력 변수
     float gravity = -80f;
-
     // 수직 속력 변수
     float yVelocity = 0;
-
     // 점프력 변수
     public float jumpPower = 1f;
-
     // 점프 상태 변수
-    public bool isJumping = false;
-
-    // 점프 상태 변수
-    //public bool isJumping = 
+    public bool isJumping = false; 
 
     // 모양의 게임 오브젝트
     public GameObject model;
@@ -39,6 +38,7 @@ public class PlayerMove : MonoBehaviour
     {
         // w, a, s, d 키를 입력하면 캐릭터를 그 방향으로 이동시키고 싶다
         // [spacebar] 키를 누르면 캐릭터를 수직으로 점프시키고 싶다
+        // [shift] 키를 누르면 캐릭터가 달리게 하고 싶다
 
         // 1. 사용자의 입력을 받는다
         float h = Input.GetAxis("Horizontal");
@@ -76,12 +76,31 @@ public class PlayerMove : MonoBehaviour
         yVelocity += gravity * Time.deltaTime;
         dir.y = yVelocity;
 
+        Vector3 modelDir = dir;
+        modelDir.y = 0;
+
+        
+
+        // 4-1. 만일, 러닝 중이었고, shift 키를 뗐다면 (다시 걷기로 돌아온다면)
+        if (isRunning && Input.GetButtonUp("Fire3"))
+        {
+            // 러닝 전 상태로 초기화한다
+            isRunning = false;
+            // 캐릭터 속도를 걷기 속도로 되돌린다
+            moveSpeed = walkSpeed;
+        }
+
+        // 4-2. 만일, 키보드 [shift] 키를 입력했고, 러닝을 하지 않은 상태라면,
+        if (Input.GetButtonDown("Fire3") && !isRunning)
+        {
+            // 캐릭터 수직 속도에 점프력을 적용하고 점프 상태로 변경한다
+            moveSpeed = runSpeed;
+            isRunning = true;
+        }
+
         //3. 이동 속도에 맞춰 이동한다
         // p = p0 + vt
         cc.Move(dir * moveSpeed * Time.deltaTime);
-
-        Vector3 modelDir = dir;
-        modelDir.y = 0;
 
         // dir 의 크기가 0보다 크면 (움직일때만)
         if (modelDir.magnitude > 0)

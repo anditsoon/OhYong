@@ -130,7 +130,8 @@ GameObject:
   - component: {fileID: 344808277}
   - component: {fileID: 344808278}
   - component: {fileID: 344808279}
-  m_Layer: 0
+  - component: {fileID: 344808280}
+  m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,6 +153,7 @@ Transform:
   m_Children:
   - {fileID: 698619834}
   - {fileID: 1450773326}
+  - {fileID: 1077810186}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &344808278
@@ -166,6 +168,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9810fe96e4a71646bfacb3db64c08e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  walkSpeed: 1
+  runSpeed: 14
+  isRunning: 0
   moveSpeed: 7
   jumpPower: 10
   isJumping: 0
@@ -196,6 +201,22 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &344808280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 344808276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35b7a4aff4dac5c4ea3b8a09ad1833cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  throwPosition: {fileID: 1077810185}
+  wpFactory: {fileID: 1446154818644955843, guid: 768fbc7b1f30be3468dbf305830c3ca7, type: 3}
+  player: {fileID: 698619830}
+  throwPower: 15
 --- !u!1 &383007682
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,7 +336,7 @@ GameObject:
   - component: {fileID: 698619834}
   - component: {fileID: 698619833}
   - component: {fileID: 698619832}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PlayerBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -495,7 +516,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -589,6 +610,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotSpeed: 200
+--- !u!1 &1077810185
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1077810186}
+  m_Layer: 0
+  m_Name: WpThrowPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1077810186
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1077810185}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.49, y: 1.2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 344808277}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1161997078
 GameObject:
   m_ObjectHideFlags: 0
@@ -601,7 +653,7 @@ GameObject:
   - component: {fileID: 1161997082}
   - component: {fileID: 1161997081}
   - component: {fileID: 1161997080}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PlayerEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -706,7 +758,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1450773326}
   - component: {fileID: 1450773327}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CamPosition
   m_TagString: Untagged
   m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
