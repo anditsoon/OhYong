@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class WeaponThrow : MonoBehaviour
 {
-    // 발사 위치
-    public GameObject throwPosition;
+    //// 발사 위치
+    //public GameObject throwPosition;
 
     // 투척 무기 오브젝트
     public GameObject wpFactory;
 
     // 플레이어
     public GameObject player;
+
+    // 무기
+    public GameObject weapon;
 
     // 투척 파워
     public float throwPower = 15f;
@@ -25,11 +28,15 @@ public class WeaponThrow : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             // 무기 오브젝트를 생성한 후 무기의 생성 위치를 발사 위치로 한다
-            GameObject weapon = Instantiate(wpFactory);
-            weapon.transform.position = throwPosition.transform.position;
+            //GameObject weapon = Instantiate(wpFactory);
+            //weapon.transform.position = throwPosition.transform.position;
+
+            // weapon 오브젝트와 연결
+            weapon = GameObject.Find("Weapon");
 
             // 무기 오브젝트의 Rigidbody 컴포넌트를 가져온다
             Rigidbody rb = weapon.GetComponent<Rigidbody>();
+            rb.useGravity = true;
 
             // 플레이어의 정면 방향으로 수류탄에 물리적인 힘을 가한다
             rb.AddForce(player.transform.forward * throwPower, ForceMode.Impulse);

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class WeaponDestroy : MonoBehaviour
@@ -7,6 +8,20 @@ public class WeaponDestroy : MonoBehaviour
 
     // 폭발 이펙트 프리팹 변수
     public GameObject wpDestroyEffect;
+
+    // 버튼을 눌렀나 안 눌렀나
+    bool isRotating = false;
+
+    private void Update()
+    {
+        // rotate 를 버튼이 눌렸을 때만 하고 싶다
+        if (!isRotating && Input.GetButtonDown("Fire3"))
+        {
+            transform.Rotate(transform.right, 100f, Space.World);
+            isRotating = true;
+        }
+        
+    }
 
     // 충돌했을 때의 처리
     private void OnCollisionEnter(Collision collision)
@@ -19,5 +34,10 @@ public class WeaponDestroy : MonoBehaviour
 
         // 자기 자신을 제거한다
         Destroy(gameObject);
+
+        if(isRotating)
+        {
+            isRotating = false;
+        }
     }
 }

@@ -5,12 +5,12 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour
 {
     // 걷기 변수
-    public float walkSpeed = 5f;
+    public float walkSpeed = 7f;
     // 달리기 변수
-    public float runSpeed = 10f;
+    public float runSpeed = 20f;
     public bool isRunning = false;
     // 이동 속도 변수
-    public float moveSpeed;
+    private float moveSpeed;
 
     // 캐릭터 콘트롤러 변수
     CharacterController cc;
@@ -31,6 +31,8 @@ public class PlayerMove : MonoBehaviour
     {
         // 캐릭터 콘트롤러 컴포넌트 받아오기
         cc = GetComponent<CharacterController>();
+
+        moveSpeed = walkSpeed;
     }
 
     // Update is called once per frame
@@ -97,6 +99,8 @@ public class PlayerMove : MonoBehaviour
             moveSpeed = runSpeed;
             isRunning = true;
         }
+
+        print(moveSpeed);
 
         //3. 이동 속도에 맞춰 이동한다
         // p = p0 + vt
