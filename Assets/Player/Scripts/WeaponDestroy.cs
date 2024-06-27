@@ -14,11 +14,16 @@ public class WeaponDestroy : MonoBehaviour
 
     private void Update()
     {
-        // rotate 를 버튼이 눌렸을 때만 하고 싶다
-        if (!isRotating && Input.GetButtonDown("Fire3"))
+
+        if(Input.GetButtonDown("Fire2"))
         {
-            transform.Rotate(transform.right, 100f, Space.World);
             isRotating = true;
+        }
+        // rotate 를 버튼이 눌렸을 때만 하고 싶다
+        if (isRotating)
+        {
+            transform.Rotate(transform.right, 30f, Space.World);
+            
         }
         
     }
@@ -35,9 +40,6 @@ public class WeaponDestroy : MonoBehaviour
         // 자기 자신을 제거한다
         Destroy(gameObject);
 
-        if(isRotating)
-        {
-            isRotating = false;
-        }
+       
     }
 }
