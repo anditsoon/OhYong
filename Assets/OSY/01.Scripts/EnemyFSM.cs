@@ -292,6 +292,8 @@ public class EnemyFSM : MonoBehaviour
     // 백점프 처리용 코루틴 함수
     IEnumerator BackJumpProcess()
     {
+        // Y는 고정한다.
+
         Vector3 startPosition = transform.position;
         Vector3 dir = (transform.position - playerTransform.position).normalized;
         Vector3 targetPosition = startPosition + dir * backJumpDistance;
