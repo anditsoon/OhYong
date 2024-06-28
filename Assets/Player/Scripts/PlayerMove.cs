@@ -27,12 +27,17 @@ public class PlayerMove : MonoBehaviour
     // 모양의 게임 오브젝트
     public GameObject model;
 
+    // 애니메이터
+    Animator anim;
+
     private void Start()
     {
         // 캐릭터 콘트롤러 컴포넌트 받아오기
         cc = GetComponent<CharacterController>();
 
         moveSpeed = walkSpeed;
+
+        anim = transform.GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -63,6 +68,7 @@ public class PlayerMove : MonoBehaviour
                 isJumping = false;
                 // 캐릭터 수직 속도를 0으로 만든다
                 yVelocity = 0;
+               
             }
         }
 
@@ -81,7 +87,7 @@ public class PlayerMove : MonoBehaviour
         Vector3 modelDir = dir;
         modelDir.y = 0;
 
-        
+
 
         // 4-1. 만일, 러닝 중이었고, shift 키를 뗐다면 (다시 걷기로 돌아온다면)
         if (isRunning && Input.GetButtonUp("Fire3"))
@@ -90,14 +96,17 @@ public class PlayerMove : MonoBehaviour
             isRunning = false;
             // 캐릭터 속도를 걷기 속도로 되돌린다
             moveSpeed = walkSpeed;
+            anim.SetBool("isSprint", false);
         }
 
         // 4-2. 만일, 키보드 [shift] 키를 입력했고, 러닝을 하지 않은 상태라면,
         if (Input.GetButtonDown("Fire3") && !isRunning)
         {
-            // 캐릭터 수직 속도에 점프력을 적용하고 점프 상태로 변경한다
+            // 캐릭터 수직 속도에 점프력을 적용하고 러닝 상태로 변경한다
             moveSpeed = runSpeed;
             isRunning = true;
+            anim.SetBool("isSprint", true);
+
         }
 
         print(moveSpeed);
@@ -111,6 +120,11 @@ public class PlayerMove : MonoBehaviour
         {
             // 움직이는 방향을 모양의 앞방향으로 설정
             model.transform.forward = modelDir;
+            anim.SetBool("isMove", true);
+        }
+        else
+        {
+            anim.SetBool("isMove", false);
         }
     }
 }
