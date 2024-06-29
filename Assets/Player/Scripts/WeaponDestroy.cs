@@ -11,6 +11,7 @@ public class WeaponDestroy : MonoBehaviour
 
     // 버튼을 눌렀나 안 눌렀나
     bool isRotating = false;
+    public bool isThrowing = false;
 
     private void Update()
     {
@@ -37,9 +38,18 @@ public class WeaponDestroy : MonoBehaviour
         // 이펙트 프리팹의 위치는 무기 오브젝트 자신의 위치와 동일하다
         eff.transform.position = transform.position;
 
+        if (isThrowing)
+        {
+            Invoke("DestroyMyself", 5f);
+        }
+
+
+
+    }
+
+    void DestroyMyself()
+    {
         // 자기 자신을 제거한다
         Destroy(gameObject);
-
-       
     }
 }
