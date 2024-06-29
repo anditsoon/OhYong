@@ -14,10 +14,12 @@ public class WeaponThrow : MonoBehaviour
     public GameObject player;
 
     // 무기
-    public GameObject weapon;
+    private GameObject weaponPoint;
 
     // 투척 파워
     public float throwPower = 15f;
+
+    public WeaponDestroy weaponDestroy;
 
     // Update is called once per frame
     void Update()
@@ -32,11 +34,14 @@ public class WeaponThrow : MonoBehaviour
             //weapon.transform.position = throwPosition.transform.position;
 
             // weapon 오브젝트와 연결
-            weapon = GameObject.Find("Weapon");
+            weaponPoint = GameObject.Find("WeaponPoint");
 
             // 무기 오브젝트의 Rigidbody 컴포넌트를 가져온다
-            Rigidbody rb = weapon.GetComponent<Rigidbody>();
+            Rigidbody rb = weaponPoint.GetComponent<Rigidbody>();
             rb.useGravity = true;
+
+            // weaponDestroy에게 던졌다는 것을 알려준다.
+            weaponDestroy.isThrowing = true;
 
             // 플레이어의 정면 방향으로 수류탄에 물리적인 힘을 가한다
             rb.AddForce(player.transform.forward * throwPower, ForceMode.Impulse);
