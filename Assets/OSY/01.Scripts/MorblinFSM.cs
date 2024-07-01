@@ -1,58 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
-using TreeEditor;
 using UnityEngine;
 
 public class MorblinFSM : MonoBehaviour
 {
-
-    //FSM State
     enum MorblinState
     {
         Idle, Move, BackJump, Return, Attack1, Attack2, Damaged, Die
     }
-    // 에너미 상태 변수
+
     MorblinState m_State;
 
-    // 활동 반경 25
-    public float activeDistance = 25;
-    // 플레이어 발견 범위
-    public float findDistance = 30f;
-    // 이동 가능 범위
-    public float moveDistance = 20f;
-    // 공격 가능 범위
-    public float attackDistance = 10f;
-    // BackJump 거리
-    public float backJumpDistance = 5f;
+    #region 거리
+    public float findStart = 50;
+    public float moveStart = 20;
+    public float attackStart = 10;
+    public float backStart = 5;
+    #endregion
 
-    // 이동 속도
-    public float moveSpeed = 5;
-
-    // 스폰 Transform
-    Vector3 originPos;
-    // 플레이어 플레이어 오브젝트
+    #region 가져오기
     public GameObject player;
-    // 플레이어와의 거리
-    float playerDistance;
-    // 원래 위치와의 거리
-    float originDistance;
+    public Vector3 originPos;
+    float distanceToPlayer;
+    Animator anim;
+    #endregion
 
-    // Attack1로 갈지 Attack2로 갈지 랜덤함수
-    int attackRandom = Random.Range(0, 2);
-
-
+    int random = 0;
 
     void Start()
     {
-        // 초반 상태는 아이들 상태
         m_State = MorblinState.Idle;
-
-        // 원래 위치를 시작지점으로 지정한다.
-        originPos = transform.position;
-
+        originPos = this.transform.position;
+        player = GameObject.Find("Player");
+        anim = transform.GetComponentInChildren<Animator>();
     }
+
     void Update()
     {
+        Vector3 thisToPlayer = player.transform.position - transform.position;
+        distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
+        transform.forward = thisToPlayer;
+
         switch (m_State)
         {
             case MorblinState.Idle:
@@ -68,116 +56,84 @@ public class MorblinFSM : MonoBehaviour
                 Return();
                 break;
             case MorblinState.Attack1:
-                //Attack1();
+                Attack1();
                 break;
             case MorblinState.Attack2:
-                //Attack2();
+                Attack2();
                 break;
             case MorblinState.Damaged:
-                //Damaged();
+                Damaged();
                 break;
             case MorblinState.Die:
-                //Die();
+                Die();
                 break;
         }
-
-        // 플레이어와의 거리 계속 계산
-        playerDistance = Vector3.Distance(transform.position, player.transform.position);
-        // 원래위치와 거리 계속 계산
-        originDistance = Vector3.Distance(transform.position, originPos);
-
-       
-
-
     }
 
     void Idle()
     {
-        print("Idle");
-        if (originDistance>activeDistance)
+        if (distanceToPlayer > findStart)
         {
-            //리턴해
-            m_State = MorblinState.Return;
+            print("아무것도안해");
         }
-        // 그렇지 않다면
-        else
+        else if (distanceToPlayer > moveStart)
         {
-            if(playerDistance > findDistance)
+            print("바라본다");
+        }
+        else if (distanceToPlayer > attackStart)
+        {
+            m_State = MorblinState.Move;
+            anim.SetTrigger("IdleToMove");
+        }
+        else if (distanceToPlayer > backStart)
+        {
+            random = Random.Range(0, 2);
+            if (random > 0)
             {
-            
-            }
-            else if(playerDistance > moveDistance)
-            {
-                // 바라본다
-                LookPlayer();
-                // 느낌표 띄운다
-                        
-            }
-            else if(playerDistance > attackDistance)
-            {
-                m_State = MorblinState.Move;
-            }
-            else if(playerDistance > backJumpDistance)
-            {
-
-                attackRandom = Random.Range(0, 2);
-
-                // 만약 attackRandom 이 0이면 Attack1로 간다
-                if (attackRandom == 0)
-                {
-                    //m_State = MorblinState.Attack1;
-
-                    // 바로 공격할 수 있게 미리 시간을 돌려놓는다
-                    //anim.SetTrigger("MoveToAttack1Delay");
-                }
-                else
-                {
-                   // m_State = MorblinState.Attack2;
-                    // 바로 공격할 수 있게 미리 시간을 돌려놓는다
-                    //anim.SetTrigger("MoveToAttack2Delay");
-                }
+                m_State = MorblinState.Attack1;
             }
             else
             {
-                // 백점프해라
+                m_State = MorblinState.Attack2;
             }
         }
+        else if (distanceToPlayer <= backStart && distanceToPlayer > 0)
+        {
+            m_State = MorblinState.BackJump;
+        }
     }
+
     void Move()
     {
-
-        // 바라본다
-        LookPlayer();
-
-        // 만약 움직 거리보다 작으면서 공격거리보다 크다면
-        if (playerDistance <= moveDistance && playerDistance > attackDistance)
+        print("이동 중");
+        if (distanceToPlayer <= moveStart && distanceToPlayer > attackStart)
         {
-            Vector3 dir = player.transform.position - transform.position;
-            dir.Normalize();
-
-            //플레이어쪽으로 움직여
-            transform.position += dir * moveSpeed * Time.deltaTime; 
+            // 플레이어를 향해 이동하는 로직 구현
+            Vector3 moveDirection = (player.transform.position - transform.position).normalized;
+            transform.position += moveDirection * Time.deltaTime * 3; // 3은 이동 속도, 필요에 따라 조정 가능
         }
-        // 그렇지 않다면
         else
         {
-            // 아이들로 돌아가
             m_State = MorblinState.Idle;
         }
-
     }
+
     void BackJump()
     {
-
+        print("뒤로 점프");
+        if (distanceToPlayer <= backStart)
+        {
+            StartCoroutine(BackJumpCoroutine());
+        }
     }
+
     void Return()
     {
-        if(activeDistance>1)
+        print("원래 위치로 돌아감");
+        if (Vector3.Distance(transform.position, originPos) > 0.1f)
         {
-            Vector3 dir = originPos - transform.position;
-            dir.Normalize();
-            transform.position += dir * 10 * Time.deltaTime;
-            print("return");
+            Vector3 returnDirection = (originPos - transform.position).normalized;
+            transform.position += returnDirection * Time.deltaTime * 3; // 3은 이동 속도, 필요에 따라 조정 가능
         }
         else
         {
@@ -185,12 +141,79 @@ public class MorblinFSM : MonoBehaviour
         }
     }
 
-    void LookPlayer()
+    void Attack1()
     {
-        // 바라본다
-        Vector3 dir = player.transform.position - transform.position;
-        transform.forward = dir;
-
+        print("공격1");
+        if (distanceToPlayer <= attackStart && distanceToPlayer > backStart)
+        {
+            // 애니메이션의 길이를 가져와서 넣는다.
+            float animDuration = 2.0f;
+            // 코루틴 실행 2초후 아이들로
+            StartCoroutine(DelayCoroutine(animDuration));
+        }
+        else
+        {
+            m_State = MorblinState.Idle;
+        }
     }
 
+    void Attack2()
+    {
+        print("공격2");
+        if (distanceToPlayer <= attackStart && distanceToPlayer > backStart)
+        {
+            // 애니메이션의 길이를 가져와서 넣는다.
+            float animDuration= 3.0f;
+            // 코루틴 실행 3초후 아이들로
+            StartCoroutine(DelayCoroutine(animDuration));
+            
+        }
+        else
+        {
+            m_State = MorblinState.Idle;
+        }
+    }
+
+    void Damaged()
+    {
+        // 애니메이션의 길이를 가져와서 넣는다.
+        float animDuration = 1.0f;
+        // 코루틴 실행 1초후 아이들로
+        StartCoroutine(DelayCoroutine(animDuration));
+    }
+
+    void Die()
+    {
+        print("사망");
+        // 사망 로직 구현
+    }
+
+    #region 코루틴함수
+    IEnumerator BackJumpCoroutine()
+    {
+        Vector3 backDirection = (transform.position - player.transform.position).normalized;
+        Vector3 startPosition = transform.position;
+        Vector3 endPosition = startPosition + backDirection * 5.0f; // 5.0f는 이동 거리, 필요에 따라 조정 가능
+
+        float duration = 1.0f; // 5초 동안 뒤로 이동
+        float elapsed = 0.0f;
+
+        while (elapsed < duration)
+        {
+            transform.position = Vector3.Lerp(startPosition, endPosition, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        m_State = MorblinState.Idle;
+    }
+    IEnumerator DelayCoroutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        m_State = MorblinState.Idle;
+    }
+
+  
+
+    #endregion
 }
