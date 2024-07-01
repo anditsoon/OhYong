@@ -12,6 +12,8 @@ public class Weapon : MonoBehaviour
     public BoxCollider meleeArea;
     //public TrailRenderer trailEffect;
 
+    public GameObject wpDestroyEffect;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -38,8 +40,17 @@ public class Weapon : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         meleeArea.enabled = true;
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(1f);
         meleeArea.enabled = false;
  
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        GameObject destroyParticle = Instantiate(wpDestroyEffect);
+
+        destroyParticle.transform.position = collision.contacts[0].point;
+
+        Destroy(gameObject);
     }
 }

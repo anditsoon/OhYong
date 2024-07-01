@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Item : MonoBehaviour
 {
-    public enum Type { Sword, Spear, Bow };
+    public enum Type { Sword, Spear, Bow, Shield };
     public Type type;
     public int value;
     // Start is called before the first frame update

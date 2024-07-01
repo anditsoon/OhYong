@@ -58,6 +58,9 @@ public class PlayerMove : MonoBehaviour
         // 2-1. 메인 카메라를 기준으로 방향을 변환한다
         dir = Camera.main.transform.TransformDirection(dir);
 
+
+        #region 점프
+
         // 2-2. 만일, 점프 중이었고, 다시 바닥에 착지했다면
         if (cc.collisionFlags == CollisionFlags.Below)
         {
@@ -87,8 +90,10 @@ public class PlayerMove : MonoBehaviour
         Vector3 modelDir = dir;
         modelDir.y = 0;
 
+        #endregion
 
 
+        #region 달리기
         // 4-1. 만일, 러닝 중이었고, shift 키를 뗐다면 (다시 걷기로 돌아온다면)
         if (isRunning && Input.GetButtonUp("Fire3"))
         {
@@ -109,12 +114,15 @@ public class PlayerMove : MonoBehaviour
 
         }
 
-        print(moveSpeed);
+        #endregion
+
+
 
         //3. 이동 속도에 맞춰 이동한다
         // p = p0 + vt
         cc.Move(dir * moveSpeed * Time.deltaTime);
 
+    
         // dir 의 크기가 0보다 크면 (움직일때만)
         if (modelDir.magnitude > 0)
         {

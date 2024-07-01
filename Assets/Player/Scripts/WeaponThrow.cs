@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class WeaponThrow : MonoBehaviour
 {
-    //// 발사 위치
-    //public GameObject throwPosition;
 
     // 투척 무기 오브젝트
     public GameObject wpFactory;
@@ -13,13 +11,14 @@ public class WeaponThrow : MonoBehaviour
     // 플레이어
     public GameObject player;
 
-    // 무기
+    // 무기 포인트
     private GameObject weaponPoint;
 
     // 투척 파워
     public float throwPower = 15f;
+    // 회전 파워
+    public float torquePower = 10f;
 
-    public WeaponDestroy weaponDestroy;
 
     // Update is called once per frame
     void Update()
@@ -29,22 +28,23 @@ public class WeaponThrow : MonoBehaviour
         // 1. 마우스 오른쪽 버튼을 입력받는다
         if (Input.GetMouseButtonDown(1))
         {
-            // 무기 오브젝트를 생성한 후 무기의 생성 위치를 발사 위치로 한다
-            //GameObject weapon = Instantiate(wpFactory);
-            //weapon.transform.position = throwPosition.transform.position;
 
             // weapon 오브젝트와 연결
             weaponPoint = GameObject.Find("WeaponPoint");
 
+            GameObject weapon = weaponPoint.GetComponentInChildren<Weapon>().gameObject;
+
+            weapon.transform.parent = null;
+
             // 무기 오브젝트의 Rigidbody 컴포넌트를 가져온다
-            Rigidbody rb = weaponPoint.GetComponent<Rigidbody>();
+            Rigidbody rb = weapon.GetComponent<Rigidbody>();
             rb.useGravity = true;
+            rb.isKinematic = false;
 
-            // weaponDestroy에게 던졌다는 것을 알려준다.
-            weaponDestroy.isThrowing = true;
 
-            // 플레이어의 정면 방향으로 수류탄에 물리적인 힘을 가한다
-            rb.AddForce(player.transform.forward * throwPower, ForceMode.Impulse);
+            // 플레이어의 정면 방향으로 무기에 물리적인 힘을 가한다
+            rb.AddForce(player.transform.forward * throwPower * Time.deltaTime, ForceMode.Impulse);
+            rb.AddTorque(transform.forward * torquePower * Time.deltaTime, ForceMode.Impulse);
         }
         
     }

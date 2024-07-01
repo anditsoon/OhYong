@@ -10,9 +10,11 @@ public class PlayerItem : MonoBehaviour
 
     bool iDown;
     bool sDown1; // 1번 장비
+    bool sDown2;
+    bool sDown3;
 
     // 사용자가 어떤 무기를 가지고 있느냐
-    public GameObject[] weapons;
+    public List<GameObject> weapons = new List<GameObject>();
     public bool[] hasWeapons;
 
     // Start is called before the first frame update
@@ -37,6 +39,7 @@ public class PlayerItem : MonoBehaviour
             nearObject = other.gameObject;
 
         }
+        Debug.Log(nearObject.name);
 
    
     }
@@ -55,14 +58,19 @@ public class PlayerItem : MonoBehaviour
     {
         iDown = Input.GetButtonDown("Interaction");
         sDown1 = Input.GetButtonDown("Swap1");
+        sDown2 = Input.GetButton("Swap2");
+        sDown3 = Input.GetButton("Swap3");
+
     }
 
     void Swap()
     {
         int weaponIndex = -1;
         if (sDown1) weaponIndex = 0;
+        if (sDown2) weaponIndex = 1;
+        if (sDown3) weaponIndex = 2;
 
-        if (sDown1) // || sDown2 || sDown3 그리고 && !isJumping 까지
+        if (sDown1 || sDown2 || sDown3) //   그리고 && !isJumping 까지
         {
             if (equipWeapon != null)
             {
@@ -79,9 +87,9 @@ public class PlayerItem : MonoBehaviour
         {
             if (nearObject.tag == "Weapon")
             {
-                Item item = nearObject.GetComponent<Item>();
-                int weaponIndex = item.value;
-                hasWeapons[weaponIndex] = true;
+                // Item item = nearObject.GetComponent<Item>();
+                weapons.Add(nearObject);
+                //hasWeapons[weaponIndex] = true;
 
                 Destroy(nearObject);
             }
